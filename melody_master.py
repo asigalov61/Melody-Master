@@ -48,6 +48,7 @@ print('Done!')
 
 #@title Extract melody
 full_path_to_MIDI_file = "/content/Melody-Master/Example-MIDI-1.mid" #@param {type:"string"}
+composition_time_resolution = 10 #@param {type:"slider", min:1, max:100, step:1}
 mono_melody_or_chorded_melody = True #@param {type:"boolean"}
 add_bass_melody = True #@param {type:"boolean"}
 mono_or_chorded_bass_melody = True #@param {type:"boolean"}
@@ -72,6 +73,9 @@ while itrack < len(score):
       if event[0] == 'note' and event[3] != 9:       
         events_matrix.append(event)
     itrack += 1
+
+for e in events_matrix:
+  e[1] = math.ceil(e[1] / composition_time_resolution)
 
 # Sorting...
 events_matrix.sort(key=lambda x: x[4], reverse=True)
@@ -212,6 +216,9 @@ melody_chords_f = []
 for m in melody_chords:
   melody_chords_f.extend(m)
 
+for m in melody_chords_f:
+  m[1] = m[1] * composition_time_resolution
+
 TMIDIX.Tegridy_SONG_to_MIDI_Converter(melody_chords_f,
                                       output_signature='Melody Master',
                                       track_name='Project Los Angeles',
@@ -237,7 +244,7 @@ NOTES_E = min(len(melody_pitches), pposition + prange)
 
 plt.figure(figsize=(15, 6))
 plt.title("Composition Melody Curve")
-plt.xlabel("Time in ms")
+plt.xlabel("Time")
 plt.ylabel("MIDI pitch")
 plt.plot(time[NOTES_S:NOTES_E], melody_pitches[NOTES_S:NOTES_E], 'o', time[NOTES_S:NOTES_E],  melody_curve[NOTES_S:NOTES_E])
 
