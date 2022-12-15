@@ -102,6 +102,16 @@ melody_pitches = [y[0][4] for y in melody_chords]
 composition_pitches = [y[4] for y in events_matrix]
 bass_pitches = [y[-1][4] for y in melody_chords if len(y) > 1]
 
+relative_melody_pitches = melody_pitches
+
+relative_composition_pitches = []
+for m in melody_chords:
+  relative_composition_pitches.append(statistics.mean([y[4] for y in m]))
+
+relative_bass_pitches = []
+for m in melody_chords:
+  relative_bass_pitches.append(m[-1][4])
+
 mean_melody_pitch = statistics.mean(melody_pitches)
 mean_composition_pitch = statistics.mean(composition_pitches)
 mean_bass_pitch = statistics.mean(bass_pitches)
@@ -112,22 +122,32 @@ melody_curve = []
 
 relative_curve_step = round(relative_melody_curve_in_notes / 2)
 
-if melody_curve_type == 'composition':
-    for i in range(len(melody_chords)):
-      melody_curve.append(statistics.mean([melody_pitches[i], mean_composition_pitch]))
-
 if melody_curve_type == 'melody':
   if use_relative_melody_curve:
     for i in range(len(melody_chords)):
-      melody_curve.append(statistics.mean([melody_pitches[i], statistics.mean(melody_pitches[max(0, i-relative_curve_step):i+relative_curve_step])]))
+      melody_curve.append(statistics.mean([melody_pitches[i], statistics.mean(relative_melody_pitches[max(0, i-relative_curve_step):i+relative_curve_step])]))
 
   else:
     for i in range(len(melody_chords)):
       melody_curve.append(statistics.mean([melody_pitches[i], mean_melody_pitch]))
 
+if melody_curve_type == 'composition':
+  if use_relative_melody_curve:
+    for i in range(len(melody_chords)):
+      melody_curve.append(statistics.mean([melody_pitches[i], statistics.mean(relative_composition_pitches[max(0, i-relative_curve_step):i+relative_curve_step])]))
+
+  else:
+    for i in range(len(melody_chords)):
+      melody_curve.append(statistics.mean([melody_pitches[i], mean_composition_pitch]))
+
 if melody_curve_type == 'bass':
-  for i in range(len(melody_chords)):
-    melody_curve.append(statistics.mean([melody_pitches[i], mean_bass_pitch]))
+  if use_relative_melody_curve:
+    for i in range(len(melody_chords)):
+      melody_curve.append(statistics.mean([melody_pitches[i], statistics.mean(relative_bass_pitches[max(0, i-relative_curve_step):i+relative_curve_step])]))
+
+  else:
+    for i in range(len(melody_chords)):
+      melody_curve.append(statistics.mean([melody_pitches[i], mean_bass_pitch]))
 
 #==================================================
 
